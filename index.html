@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>陳加蜂蜜｜屏東枋山在地蜂蜜</title>
+    <meta
+      name="description"
+      content="陳加蜂蜜位於屏東縣枋山鄉，分享蜂場環境、在地蜂蜜特色與 24 小時溫度、濕度、風速觀測。"
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header" aria-label="主要導覽">
+      <a class="brand" href="#top" aria-label="陳加蜂蜜首頁">
+        <span class="brand-mark">陳</span>
+        <span>陳加蜂蜜</span>
+      </a>
+      <nav class="nav-links" aria-label="網站導覽">
+        <a href="#about">蜂場</a>
+        <a href="#weather">氣象</a>
+        <a href="#products">蜂蜜</a>
+        <a href="#contact">聯絡</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-label="陳加蜂蜜主視覺">
+        <img src="assets/chenjia-apiary-hero.png" alt="屏東枋山果樹下排列整齊的陳加蜂蜜蜂箱" class="hero-image">
+        <div class="hero-shade"></div>
+        <div class="hero-content">
+          <p class="eyebrow">屏東縣枋山鄉</p>
+          <h1>陳加蜂蜜</h1>
+          <p class="hero-copy">果樹蔭下的蜂場，採集南台灣陽光、海風與花香，釀成乾淨溫潤的在地蜂蜜。</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#weather">查看 24 小時氣象</a>
+            <a class="button secondary" href="#contact">預約詢問</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" class="section split">
+        <div>
+          <p class="eyebrow">Fangshan Apiary</p>
+          <h2>在山海交會處照顧每一箱蜂</h2>
+        </div>
+        <div class="section-copy">
+          <p>枋山位在屏東南端，日照充足、風勢明顯，蜜源植物隨季節轉換。陳加蜂蜜以穩定照護蜂群、留意環境變化為核心，讓每一批蜂蜜都保有自然花香與清爽尾韻。</p>
+          <dl class="facts">
+            <div>
+              <dt>所在地</dt>
+              <dd>屏東縣枋山鄉</dd>
+            </div>
+            <div>
+              <dt>蜂場環境</dt>
+              <dd>果樹林、海風、充足日照</dd>
+            </div>
+            <div>
+              <dt>關注指標</dt>
+              <dd>溫度、濕度、風速</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <section id="weather" class="weather-section">
+        <div class="section weather-heading">
+          <div>
+            <p class="eyebrow">24 小時蜂場氣象</p>
+            <h2>溫度、濕度與風速變化</h2>
+          </div>
+          <p class="weather-note">示範資料可替換為實際感測器或氣象 API；目前呈現最近 24 小時趨勢。</p>
+        </div>
+
+        <div class="chart-shell" aria-label="最近 24 小時氣象圖表">
+          <div class="chart-toolbar">
+            <div class="legend" aria-label="圖例">
+              <button class="legend-item active" type="button" data-series="temperature">
+                <span class="legend-line temperature"></span>溫度
+              </button>
+              <button class="legend-item active" type="button" data-series="humidity">
+                <span class="legend-line humidity"></span>濕度
+              </button>
+              <button class="legend-item active" type="button" data-series="wind">
+                <span class="legend-line wind"></span>風速
+              </button>
+            </div>
+            <p class="chart-range">00:00 - 23:00</p>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="weatherChart" width="1200" height="480" aria-label="24 小時溫度濕度風速折線圖"></canvas>
+            <output id="chartTooltip" class="chart-tooltip" hidden></output>
+          </div>
+        </div>
+
+        <div class="weather-cards" aria-label="氣象摘要">
+          <article class="metric-card temperature-card">
+            <span>溫度變化</span>
+            <strong id="temperatureNow">--</strong>
+            <p id="temperatureRange">低 -- ｜ 高 --</p>
+          </article>
+          <article class="metric-card humidity-card">
+            <span>濕度變化</span>
+            <strong id="humidityNow">--</strong>
+            <p id="humidityRange">低 -- ｜ 高 --</p>
+          </article>
+          <article class="metric-card wind-card">
+            <span>風速變化</span>
+            <strong id="windNow">--</strong>
+            <p id="windRange">低 -- ｜ 高 --</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="products" class="section products">
+        <div>
+          <p class="eyebrow">Honey</p>
+          <h2>清亮、花香、適合日常</h2>
+        </div>
+        <div class="product-grid">
+          <article class="product-card">
+            <span class="product-icon">01</span>
+            <h3>原蜜香氣</h3>
+            <p>保留當季蜜源風味，入口柔順，適合直接品嚐或沖泡溫飲。</p>
+          </article>
+          <article class="product-card">
+            <span class="product-icon">02</span>
+            <h3>小批採收</h3>
+            <p>依蜂群狀態與天候調整採收節奏，重視穩定品質。</p>
+          </article>
+          <article class="product-card">
+            <span class="product-icon">03</span>
+            <h3>在地送禮</h3>
+            <p>來自屏東枋山的甜味記憶，適合家庭、伴手禮與節慶禮盒。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="contact" class="contact">
+        <div>
+          <p class="eyebrow">Contact</p>
+          <h2>想了解蜂蜜或到訪蜂場？</h2>
+          <p>歡迎留下預約與訂購資訊，陳加蜂蜜會依季節採收狀況回覆。</p>
+        </div>
+        <a class="button primary" href="tel:+886000000000">電話詢問</a>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>陳加蜂蜜</span>
+      <span>屏東縣枋山鄉</span>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
