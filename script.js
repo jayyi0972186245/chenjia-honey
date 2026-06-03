@@ -1,43 +1,39 @@
 const hours = Array.from({ length: 24 }, (_, index) => `${String(index).padStart(2, "0")}:00`);
 
-const weatherData = {
+const environmentData = {
   temperature: {
     label: "溫度",
     unit: "°C",
-    color: "#cf503b",
-    values: [26.2, 25.5, 25.5, 25.8, 26.1, 26.0, 27.6, 29.1, 30.2, 30.6, 31.2, 31.3, 31.3, 31.0, 31.6, 31.0, 30.5, 29.6, 27.7, 27.7, 27.8, 28.0, 27.6, 27.2],
+    color: "#d4553f",
+    values: [26.1, 25.8, 25.7, 25.9, 26.2, 26.5, 27.4, 28.6, 29.8, 30.5, 31.1, 31.4, 31.3, 30.9, 30.3, 29.4, 28.8, 28.2, 27.8, 27.5, 27.2, 26.9, 26.7, 26.4],
   },
   humidity: {
     label: "濕度",
     unit: "%",
-    color: "#2e7fbe",
-    values: [78, 78, 82, 82, 83, 85, 78, 63, 60, 59, 59, 58, 60, 63, 60, 63, 65, 70, 78, 85, 84, 81, 82, 85],
+    color: "#2d82bd",
+    values: [84, 85, 85, 84, 83, 82, 79, 75, 70, 66, 63, 61, 60, 62, 65, 68, 72, 76, 79, 81, 82, 83, 84, 84],
   },
-  wind: {
-    label: "風速",
-    unit: " km/h",
-    color: "#7868c9",
-    values: [2.8, 3.6, 2.7, 1.9, 2.2, 2.1, 6.0, 9.5, 9.0, 9.8, 10.2, 11.5, 13.2, 15.2, 12.8, 12.6, 13.7, 16.0, 14.0, 12.0, 13.8, 14.6, 16.2, 18.1],
+  co2: {
+    label: "CO2",
+    unit: " ppm",
+    color: "#765ecb",
+    values: [612, 628, 641, 650, 665, 682, 708, 736, 762, 788, 815, 842, 855, 848, 826, 801, 775, 742, 716, 690, 668, 646, 628, 618],
   },
 };
 
-const visibleSeries = new Set(Object.keys(weatherData));
-const canvas = document.querySelector("#weatherChart");
+const visibleSeries = new Set(Object.keys(environmentData));
+const canvas = document.querySelector("#environmentChart");
 const tooltip = document.querySelector("#chartTooltip");
 const ctx = canvas.getContext("2d");
 let hoverIndex = null;
+let railDirection = "向右";
 
-function scaleValue(value, min, max, top, bottom) {
-  if (max === min) return (top + bottom) / 2;
-  return bottom - ((value - min) / (max - min)) * (bottom - top);
-}
-
-function getBounds(seriesKeys) {
-  const values = seriesKeys.flatMap((key) => weatherData[key].values);
+function scaleSeriesValue(key, value, top, bottom) {
+  const values = environmentData[key].values;
   const min = Math.min(...values);
   const max = Math.max(...values);
   const padding = (max - min) * 0.12 || 1;
-  return { min: min - padding, max: max + padding };
+  return bottom - ((value - (min - padding)) / ((max + padding) - (min - padding))) * (bottom - top);
 }
 
 function drawChart() {
@@ -58,7 +54,6 @@ function drawChart() {
   const plotWidth = width - padding.left - padding.right;
   const plotHeight = height - padding.top - padding.bottom;
   const activeKeys = [...visibleSeries];
-  const { min, max } = getBounds(activeKeys.length ? activeKeys : Object.keys(weatherData));
 
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = "#fbfcf7";
@@ -66,10 +61,6 @@ function drawChart() {
 
   ctx.strokeStyle = "#dce3d2";
   ctx.lineWidth = 1;
-  ctx.fillStyle = "#657064";
-  ctx.font = "700 14px Microsoft JhengHei, sans-serif";
-  ctx.textBaseline = "middle";
-
   for (let index = 0; index <= 4; index += 1) {
     const y = padding.top + (plotHeight / 4) * index;
     ctx.beginPath();
@@ -78,19 +69,20 @@ function drawChart() {
     ctx.stroke();
   }
 
-  ctx.fillStyle = "#657064";
+  ctx.fillStyle = "#637268";
   ctx.font = "800 16px Microsoft JhengHei, sans-serif";
+  ctx.textBaseline = "middle";
   ctx.textAlign = "left";
   ctx.fillText("00:00", padding.left, height - 24);
   ctx.textAlign = "right";
   ctx.fillText("23:00", width - padding.right, height - 24);
 
   activeKeys.forEach((key) => {
-    const series = weatherData[key];
+    const series = environmentData[key];
     ctx.beginPath();
     series.values.forEach((value, index) => {
       const x = padding.left + (plotWidth / 23) * index;
-      const y = scaleValue(value, min, max, padding.top, padding.top + plotHeight);
+      const y = scaleSeriesValue(key, value, padding.top, padding.top + plotHeight);
       if (index === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     });
@@ -103,7 +95,7 @@ function drawChart() {
 
   if (hoverIndex !== null) {
     const x = padding.left + (plotWidth / 23) * hoverIndex;
-    ctx.strokeStyle = "rgba(36, 48, 40, 0.18)";
+    ctx.strokeStyle = "rgba(31, 42, 36, 0.18)";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(x, padding.top);
@@ -111,8 +103,8 @@ function drawChart() {
     ctx.stroke();
 
     activeKeys.forEach((key) => {
-      const series = weatherData[key];
-      const y = scaleValue(series.values[hoverIndex], min, max, padding.top, padding.top + plotHeight);
+      const series = environmentData[key];
+      const y = scaleSeriesValue(key, series.values[hoverIndex], padding.top, padding.top + plotHeight);
       ctx.fillStyle = "#fbfaf4";
       ctx.strokeStyle = series.color;
       ctx.lineWidth = 4;
@@ -134,7 +126,7 @@ function updateTooltip(event) {
   hoverIndex = Math.max(0, Math.min(23, rawIndex));
 
   const rows = [...visibleSeries].map((key) => {
-    const series = weatherData[key];
+    const series = environmentData[key];
     return `${series.label} ${series.values[hoverIndex]}${series.unit}`;
   });
 
@@ -153,7 +145,7 @@ function hideTooltip() {
 
 function updateMetricCards() {
   const formatRange = (key) => {
-    const { values, unit } = weatherData[key];
+    const { values, unit } = environmentData[key];
     return {
       latest: `${values.at(-1)}${unit}`,
       range: `低 ${Math.min(...values)}${unit} ｜ 高 ${Math.max(...values)}${unit}`,
@@ -162,14 +154,28 @@ function updateMetricCards() {
 
   const temperature = formatRange("temperature");
   const humidity = formatRange("humidity");
-  const wind = formatRange("wind");
+  const co2 = formatRange("co2");
 
   document.querySelector("#temperatureNow").textContent = `最新 ${temperature.latest}`;
   document.querySelector("#temperatureRange").textContent = temperature.range;
   document.querySelector("#humidityNow").textContent = `最新 ${humidity.latest}`;
   document.querySelector("#humidityRange").textContent = humidity.range;
-  document.querySelector("#windNow").textContent = `最新 ${wind.latest}`;
-  document.querySelector("#windRange").textContent = wind.range;
+  document.querySelector("#co2Now").textContent = `最新 ${co2.latest}`;
+  document.querySelector("#co2Range").textContent = co2.range;
+}
+
+function updateSystemClock() {
+  const now = new Date();
+  const timeText = now.toLocaleTimeString("zh-TW", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  document.querySelector("#lastUpdate").textContent = timeText;
+}
+
+function updateRailDirection() {
+  railDirection = railDirection === "向右" ? "向左" : "向右";
+  document.querySelector("#railDirection").textContent = railDirection;
 }
 
 document.querySelectorAll(".legend-item").forEach((button) => {
@@ -193,4 +199,7 @@ canvas.addEventListener("touchend", hideTooltip);
 window.addEventListener("resize", drawChart);
 
 updateMetricCards();
+updateSystemClock();
 drawChart();
+setInterval(updateSystemClock, 60 * 1000);
+setInterval(updateRailDirection, 6000);
