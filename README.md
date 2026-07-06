@@ -14,8 +14,42 @@
 
 - `index.html`：智慧蜂箱監測儀表板
 - `styles.css`：儀表板樣式
-- `script.js`：24 小時圖表與滑軌狀態互動
+- `script.js`：讀取資料、24 小時圖表與滑軌狀態互動
+- `data/environment.json`：感測資料來源（Jetson 產出，前端定時讀取）
 - `assets/chenjia-apiary-hero.png`：蜂場視覺圖片
+
+## 資料串接（Jetson Orin Nano）
+
+前端每 60 秒讀取一次 `data/environment.json`。只要 Jetson 定期把最新資料
+覆寫到這個檔案（或改 `script.js` 中的 `DATA_URL` 指向雲端 API），儀表板就會
+自動更新，不需要改動版面。讀取失敗時會自動退回內建示範資料，畫面不會空白。
+
+### JSON 格式
+
+Jetson 只需輸出「時間戳 + 數字陣列」，樣式（標籤、單位、顏色）由前端負責。
+
+```json
+{
+  "updatedAt": "2026-07-06T14:32:00+08:00",
+  "labels": ["00:00", "01:00", "…", "23:00"],
+  "series": {
+    "temperature": [26.1, 25.8, "…（共 24 筆）"],
+    "humidity":    [84, 85, "…"],
+    "co2":         [612, 628, "…"]
+  },
+  "rail": { "status": "掃描中", "direction": "向右", "mode": "連續巡航" }
+}
+```
+
+欄位說明：
+
+- `updatedAt`：ISO 8601 時間戳，含時區（例：`+08:00`）。顯示於「資料更新」，
+  並用來判斷連線狀態——超過 10 分鐘未更新會標示「資料延遲」。
+- `labels`：X 軸時間標籤，長度需與 `series` 各陣列相同（可省略，預設 00:00–23:00）。
+- `series`：`temperature` / `humidity` / `co2` 三組數值陣列。缺項會退回示範資料。
+- `rail`：滑軌狀態（`status` 狀態、`direction` 目前方向、`mode` 掃描方式），可省略。
+
+調整讀取頻率或延遲判定門檻，可修改 `script.js` 最上方的 `REFRESH_MS`、`STALE_MS`。
 
 ## GitHub Pages 發布方式
 

@@ -163,7 +163,8 @@ a {
   display: block;
   color: var(--muted);
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .status-strip span {
@@ -179,6 +180,14 @@ a {
 
 .ok {
   color: #86efac;
+}
+
+.demo {
+  color: #f4d58d;
+}
+
+.stale {
+  color: #f6a35c;
 }
 
 .panel {
@@ -521,7 +530,18 @@ canvas {
   }
 
   to {
-    transform: translateX(calc(86vw - 180px));
+    transform: translateX(var(--rail-travel, 60%));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail-car {
+    animation: none;
+    transform: translateX(calc(var(--rail-travel, 60%) / 2));
+  }
+
+  html {
+    scroll-behavior: auto;
   }
 }
 
@@ -565,15 +585,5 @@ canvas {
   canvas {
     height: 330px;
     min-height: 300px;
-  }
-
-  @keyframes scanRail {
-    from {
-      transform: translateX(0);
-    }
-
-    to {
-      transform: translateX(calc(100vw - 170px));
-    }
   }
 }
