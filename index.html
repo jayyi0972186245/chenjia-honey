@@ -114,8 +114,9 @@
         <div class="video-grid">
           <article class="video-card">
             <div class="video-frame camera-frame">
-              <img src="assets/chenjia-apiary-hero.png" alt="LOGI 4K 巢片一般影像示意畫面">
+              <img id="cameraFeed" src="assets/chenjia-apiary-hero.png" alt="LOGI 4K 巢片一般影像">
               <span class="feed-badge">LOGI 4K</span>
+              <span class="feed-time" id="cameraTime">示範畫面</span>
             </div>
             <div class="video-meta">
               <h3>一般影像畫面</h3>
@@ -124,13 +125,15 @@
           </article>
 
           <article class="video-card">
-            <div class="video-frame thermal-frame" aria-label="Lepton 2.5 熱影像示意畫面">
+            <div class="video-frame thermal-frame" aria-label="Lepton 2.5 熱影像畫面">
               <div class="thermal-map">
                 <span></span>
                 <span></span>
                 <span></span>
               </div>
+              <img id="thermalFeed" alt="Lepton 2.5 熱影像畫面" hidden>
               <span class="feed-badge">Lepton 2.5</span>
+              <span class="feed-time" id="thermalTime">示範畫面</span>
             </div>
             <div class="video-meta">
               <h3>熱影像畫面</h3>

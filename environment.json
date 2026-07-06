@@ -110,5 +110,16 @@
     "status": "掃描中",
     "direction": "向右",
     "mode": "連續巡航"
+  },
+  "feeds": {
+    "camera": {
+      "url": "",
+      "updatedAt": ""
+    },
+    "thermal": {
+      "url": "",
+      "updatedAt": "",
+      "note": ""
+    }
   }
 }

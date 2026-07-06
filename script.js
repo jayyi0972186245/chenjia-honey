@@ -32,11 +32,19 @@ const state = {
   labels: DEFAULT_LABELS.slice(),
   series: structuredClone(DEMO_DATA.series),
   rail: { ...DEMO_DATA.rail },
+  feeds: {},                 // { camera: {url, updatedAt}, thermal: {url, updatedAt, note} }
 };
 
 const DATA_URL = "data/environment.json";
-const REFRESH_MS = 60 * 1000;        // 每 60 秒抓一次
+const REFRESH_MS = 60 * 1000;        // 每 60 秒抓一次感測資料
 const STALE_MS = 10 * 60 * 1000;     // 資料超過 10 分鐘未更新 → 標示延遲
+const IMG_REFRESH_MS = 5 * 1000;     // 影像每 5 秒換一次最新快照
+
+/* 影像區塊對應的 DOM，url 由 environment.json 的 feeds 提供 */
+const FEED_ELEMENTS = {
+  camera: { img: "#cameraFeed", time: "#cameraTime", placeholder: null },
+  thermal: { img: "#thermalFeed", time: "#thermalTime", placeholder: ".thermal-map" },
+};
 
 const visibleSeries = new Set(Object.keys(SERIES_CONFIG));
 const canvas = document.querySelector("#environmentChart");
@@ -68,7 +76,9 @@ function applyData(data, source) {
   });
 
   if (data.rail) state.rail = { ...state.rail, ...data.rail };
+  state.feeds = data.feeds && typeof data.feeds === "object" ? data.feeds : {};
   render();
+  refreshFeeds();
 }
 
 /* ============================================================
@@ -263,6 +273,52 @@ function updateRailInfo() {
   if (modeEl) modeEl.textContent = state.rail.mode ?? "連續巡航";
 }
 
+function formatFeedTime(iso) {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+}
+
+/* 影像快照：把 <img> 指向雲端圖床最新那張，帶防快取參數；
+   讀不到或沒設定 url 時退回示範畫面（相機保留 hero 圖、熱影像保留漸層底）。 */
+function refreshFeeds() {
+  Object.entries(FEED_ELEMENTS).forEach(([key, sel]) => {
+    const img = document.querySelector(sel.img);
+    const timeEl = document.querySelector(sel.time);
+    const placeholder = sel.placeholder ? document.querySelector(sel.placeholder) : null;
+    if (!img) return;
+
+    const feed = state.feeds?.[key];
+    const url = typeof feed?.url === "string" ? feed.url.trim() : "";
+
+    if (!url) {
+      // 沒有雲端來源 → 維持示範畫面
+      if (sel.placeholder) img.hidden = true;              // 熱影像：藏 img、露出漸層底
+      if (placeholder) placeholder.style.display = "";
+      if (timeEl) timeEl.textContent = "示範畫面";
+      return;
+    }
+
+    const bustUrl = `${url}${url.includes("?") ? "&" : "?"}t=${Date.now()}`;
+    img.onload = () => {
+      img.hidden = false;
+      if (placeholder) placeholder.style.display = "none";
+      const t = formatFeedTime(feed.updatedAt);
+      if (timeEl) timeEl.textContent = t ? `擷取 ${t}` : "即時";
+    };
+    img.onerror = () => {
+      // 圖床連不到 → 退回示範畫面，不讓版面破圖
+      if (sel.placeholder) {
+        img.hidden = true;
+        if (placeholder) placeholder.style.display = "";
+      }
+      if (timeEl) timeEl.textContent = "影像暫時無法讀取";
+    };
+    img.src = bustUrl;
+  });
+}
+
 function render() {
   updateStatusStrip();
   updateMetricCards();
@@ -325,3 +381,4 @@ window.addEventListener("resize", () => {
 sizeRail();
 fetchData();
 setInterval(fetchData, REFRESH_MS);
+setInterval(refreshFeeds, IMG_REFRESH_MS);
